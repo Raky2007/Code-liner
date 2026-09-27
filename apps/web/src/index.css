@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-main: #F8FAFC;
+    --surface: #FFFFFF;
+    --surface-secondary: #F1F5F9;
+    --surface-subtle: #F8FAFC;
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-muted: #64748B;
+    --text-disabled: #94A3B8;
+    --border-subtle: #E2E8F0;
+    --border-hover: #CBD5E1;
+    --border-brand: #93C5FD;
+    --primary: #2563EB;
+    --primary-hover: #1D4ED8;
+    --primary-bright: #3B82F6;
+    --primary-light: #DBEAFE;
+    --primary-subtle: #EFF6FF;
+    --cyan: #06B6D4;
+    --cyan-light: #CFFAFE;
+    --violet: #7C3AED;
+    --violet-light: #EDE9FE;
+    --success: #16A34A;
+    --warning: #D97706;
+    --error: #DC2626;
+    --terminal-bg: #0F172A;
+    --terminal-text: #E2E8F0;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Subtle Technical Grid for Marketing & Hero Sections */
+.bg-tech-grid {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(226, 232, 240, 0.55) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(226, 232, 240, 0.55) 1px, transparent 1px);
+}
+
+.bg-radial-glow {
+  background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.06) 0%, rgba(6, 182, 212, 0.03) 45%, transparent 70%);
+}
+
+/* Custom Minimalist Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Monaco Editor Container Polish */
+.monaco-editor {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+/* React Flow customizations for professional developer tool aesthetic */
+.react-flow__edge-path {
+  stroke: #CBD5E1 !important;
+  stroke-width: 1.5 !important;
+  transition: stroke 0.2s ease, stroke-width 0.2s ease;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #2563EB !important;
+  stroke-width: 2 !important;
+}
+
+.react-flow__controls {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06) !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  background: #FFFFFF !important;
+}
+
+.react-flow__controls-button {
+  background: #FFFFFF !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  fill: #475569 !important;
+  color: #475569 !important;
+}
+
+.react-flow__controls-button:hover {
+  background: #F8FAFC !important;
+  fill: #0F172A !important;
+}
