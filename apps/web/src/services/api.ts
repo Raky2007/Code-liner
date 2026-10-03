@@ -8,6 +8,8 @@ export const setAuthToken = (token: string | null) => {
   }
 };
 
+const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+
 export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   const token = getAuthToken();
   const headers = {
@@ -21,7 +23,11 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
     delete headers['Content-Type'];
   }
 
-  const response = await fetch(endpoint, {
+  const url = endpoint.startsWith('http')
+    ? endpoint
+    : `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+
+  const response = await fetch(url, {
     ...options,
     headers,
   });
