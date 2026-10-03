@@ -15,6 +15,7 @@ interface AIChatDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   projectName: string;
+  initialQuery?: string;
 }
 
 const quickPrompts = [
@@ -24,10 +25,21 @@ const quickPrompts = [
   'Are there any security or complexity hotspots?',
 ];
 
+// Clean markdown symbols like ### and ** from chat text
+function cleanChatText(text: string): string {
+  if (!text) return '';
+  return text
+    .replace(/^#{1,6}\s+/gm, '') // Remove ###, ##, # headers
+    .replace(/\*\*(.*?)\*\*/g, '$1') // Remove **bold**
+    .replace(/\*(.*?)\*/g, '$1') // Remove *italic*
+    .replace(/__([^_]+)__/g, '$1'); // Remove __underline__
+}
+
 export const AIChatDrawer: React.FC<AIChatDrawerProps> = ({
   isOpen,
   onClose,
   projectName,
+  initialQuery,
 }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -36,13 +48,14 @@ export const AIChatDrawer: React.FC<AIChatDrawerProps> = ({
     {
       id: 'welcome',
       sender: 'ai',
-      text: `Hello! I am your **Code-Liner AI Architect**. Ask me anything about the **${projectName}** repository architecture, modules, or implementations.`,
+      text: `Hello! I am your Code-Liner AI Architect. Ask me anything about the ${projectName} repository architecture, modules, or implementations.`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const lastInitialQueryRef = useRef<string | undefined>(undefined);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -53,6 +66,13 @@ export const AIChatDrawer: React.FC<AIChatDrawerProps> = ({
       scrollToBottom();
     }
   }, [messages, isOpen]);
+
+  useEffect(() => {
+    if (isOpen && initialQuery && initialQuery !== lastInitialQueryRef.current) {
+      lastInitialQueryRef.current = initialQuery;
+      handleSend(initialQuery);
+    }
+  }, [isOpen, initialQuery]);
 
   const handleSend = async (queryText?: string) => {
     const textToSend = queryText || input;
@@ -83,7 +103,7 @@ export const AIChatDrawer: React.FC<AIChatDrawerProps> = ({
       const errorMsg: AIChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'ai',
-        text: `⚠️ **Analysis Error**: ${err.message || 'Failed to query codebase.'}`,
+        text: `⚠️ Analysis Error: ${err.message || 'Failed to query codebase.'}`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages(prev => [...prev, errorMsg]);
@@ -140,7 +160,7 @@ export const AIChatDrawer: React.FC<AIChatDrawerProps> = ({
                 }`}
               >
                 <div className="whitespace-pre-wrap text-[13px] space-y-2">
-                  {msg.text}
+                  {cleanChatText(msg.text)}
                 </div>
 
                 {/* File Reference Chips */}

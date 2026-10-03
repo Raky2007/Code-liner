@@ -15,6 +15,7 @@ export interface FileMetadata {
   functions: FunctionEntity[];
   imports: ImportEntity[];
   exports: ExportEntity[];
+  variables?: string[];
 }
 
 export interface ClassEntity {
@@ -73,6 +74,8 @@ export interface AIOptimization {
   tradeoffs: string;
   explanation: string;
   alternativeCode: string;
+  keyChanges?: string[];
+  resolvedIssues?: string[];
 }
 
 export interface ArchitectureGraphData {
@@ -97,3 +100,103 @@ export interface AIChatMessage {
   timestamp: string;
   referencedFiles?: string[];
 }
+
+export interface DocumentationEndpoint {
+  method: string;
+  path: string;
+  handler: string;
+  purpose?: string;
+  sourceFile: string;
+}
+
+export interface DocumentationKeyModule {
+  path: string;
+  name: string;
+  responsibility: string;
+  functionsCount: number;
+  classesCount: number;
+  importantSymbols: string[];
+  relationships: string[];
+}
+
+export interface DocumentationStep {
+  step: number;
+  title: string;
+  description: string;
+}
+
+export interface DocumentationTechStack {
+  languages: string[];
+  frameworks: string[];
+  buildTools: string[];
+  databases: string[];
+}
+
+export interface DocumentationArchitectureLayer {
+  name: string;
+  description: string;
+  evidence: string;
+  modules: string[];
+}
+
+export interface DocumentationData {
+  overview: {
+    projectName: string;
+    purpose: string;
+    primaryLanguage: string;
+    mainFramework: string;
+    totalFiles: number;
+    totalLines: number;
+    codeHealthScore: number | null;
+    totalIssues: number;
+  };
+  techStack: DocumentationTechStack;
+  structure: {
+    rootName: string;
+    treeText: string;
+    topDirectories: Array<{ path: string; count: number; purpose: string }>;
+  };
+  architecture: {
+    patternName: string;
+    description: string;
+    layers: DocumentationArchitectureLayer[];
+  };
+  keyModules: DocumentationKeyModule[];
+  dependencies: {
+    directCount: number;
+    devCount: number;
+    highlights: Array<{ name: string; version: string; purpose: string }>;
+    all: Array<{ name: string; version: string; type: 'direct' | 'dev' }>;
+  };
+  endpoints: {
+    detected: boolean;
+    list: DocumentationEndpoint[];
+    notice?: string;
+  };
+  workflow: DocumentationStep[];
+  codeHealth: {
+    score: number | null;
+    status: string;
+    criticalCount: number;
+    highCount: number;
+    mediumCount: number;
+    lowCount: number;
+    topRisks: Array<{
+      title: string;
+      severity: string;
+      file: string;
+      line: number;
+      description: string;
+    }>;
+  };
+  recommendedImprovements: Array<{
+    problem: string;
+    action: string;
+    file: string;
+    line: number;
+    impact: 'High' | 'Medium' | 'Low';
+    effort: 'Low' | 'Medium' | 'High';
+    scoreGain?: number;
+  }>;
+}
+

@@ -4,7 +4,7 @@ import { projectService } from '../services/projectService';
 import { Search, Sparkles, Command, ArrowLeft } from 'lucide-react';
 import CommandPaletteModal from '../components/common/CommandPaletteModal';
 import AIChatDrawer from '../components/common/AIChatDrawer';
-import { FileMetadata } from '../types';
+import { FileMetadata, CodeIssue } from '../types';
 
 interface Project {
   _id: string;
@@ -25,10 +25,12 @@ interface Project {
 interface ProjectContextType {
   project: Project | null;
   files: FileMetadata[];
+  issues: CodeIssue[];
   loading: boolean;
   refreshProject: () => Promise<void>;
   openSearch: () => void;
   openChat: () => void;
+  openChatWithContext: (query: string) => void;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
@@ -45,27 +47,36 @@ export default function ProjectDetailLayout() {
 
   const [project, setProject] = useState<Project | null>(null);
   const [files, setFiles] = useState<FileMetadata[]>([]);
+  const [issues, setIssues] = useState<CodeIssue[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Modals & Drawers
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatQuery, setChatQuery] = useState<string | undefined>(undefined);
 
   const fetchProjectData = async () => {
     if (!id) return;
     try {
-      const [projectData, filesData] = await Promise.all([
+      const [projectData, filesData, issuesData] = await Promise.all([
         projectService.getProjectById(id),
         projectService.getFiles(id).catch(() => []),
+        projectService.getIssues(id).catch(() => []),
       ]);
       setProject(projectData);
       setFiles(filesData);
+      setIssues(issuesData);
     } catch (err) {
       console.error('Failed to load project details:', err);
       navigate('/dashboard');
     } finally {
       setLoading(false);
     }
+  };
+
+  const openChatWithContext = (query: string) => {
+    setChatQuery(query);
+    setIsChatOpen(true);
   };
 
   useEffect(() => {
@@ -100,6 +111,7 @@ export default function ProjectDetailLayout() {
     { label: 'Dependencies', path: 'dependencies' },
     { label: 'Issues & Smells', path: 'issues' },
     { label: 'Documentation', path: 'documentation' },
+    { label: 'Improve Code Health', path: 'improve-health' },
   ];
 
   return (
@@ -107,10 +119,15 @@ export default function ProjectDetailLayout() {
       value={{ 
         project, 
         files, 
+        issues,
         loading, 
         refreshProject: fetchProjectData,
         openSearch: () => setIsSearchOpen(true),
-        openChat: () => setIsChatOpen(true),
+        openChat: () => {
+          setChatQuery(undefined);
+          setIsChatOpen(true);
+        },
+        openChatWithContext,
       }}
     >
       <div className="h-screen w-screen bg-[#F8FAFC] flex flex-col font-sans text-[#0F172A] overflow-hidden select-none">
@@ -204,8 +221,12 @@ export default function ProjectDetailLayout() {
 
         <AIChatDrawer
           isOpen={isChatOpen}
-          onClose={() => setIsChatOpen(false)}
+          onClose={() => {
+            setIsChatOpen(false);
+            setChatQuery(undefined);
+          }}
           projectName={project?.name || 'Codebase'}
+          initialQuery={chatQuery}
         />
       </div>
     </ProjectContext.Provider>

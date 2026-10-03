@@ -587,14 +587,44 @@ export class GenericTextAnalyzer extends LanguageAnalyzer {
     else if (fileName.includes('dockerfile')) detectedLang = 'dockerfile';
 
     const lines = code.split(/\r?\n/);
+    const variables: string[] = [];
+    const exports: ParsedExport[] = [];
+
+    // Parse variables for .env or config files
+    if (detectedLang === 'config' || ext === 'env' || fileName.startsWith('.env')) {
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line || line.startsWith('#')) continue;
+        const eqIdx = line.indexOf('=');
+        if (eqIdx > 0) {
+          const key = line.substring(0, eqIdx).trim();
+          if (/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) {
+            variables.push(key);
+            exports.push({ name: key, type: 'variable' });
+          }
+        }
+      }
+    } else if (detectedLang === 'json') {
+      try {
+        const obj = JSON.parse(code);
+        if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
+          Object.keys(obj).slice(0, 50).forEach(key => {
+            variables.push(key);
+            exports.push({ name: key, type: 'variable' });
+          });
+        }
+      } catch (e) {
+        // Ignore json parse error
+      }
+    }
 
     return {
       language: detectedLang,
       imports: [],
-      exports: [],
+      exports,
       functions: [],
       classes: [],
-      variables: [],
+      variables,
       calls: [],
       linesCount: lines.length,
     };

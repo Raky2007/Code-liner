@@ -9,10 +9,15 @@ export const aiService = {
     });
   },
 
-  suggestAlternative: async (projectId: string, filePath: string, codeBlock: string): Promise<AIOptimization> => {
+  suggestAlternative: async (
+    projectId: string,
+    filePath: string,
+    codeBlock: string,
+    goal?: string
+  ): Promise<AIOptimization> => {
     return apiFetch(`/api/projects/${projectId}/alternative`, {
       method: 'POST',
-      body: JSON.stringify({ filePath, codeBlock }),
+      body: JSON.stringify({ filePath, codeBlock, goal }),
     });
   },
 

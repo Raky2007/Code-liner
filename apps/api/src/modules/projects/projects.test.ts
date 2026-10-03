@@ -9,7 +9,7 @@ describe('Project and Auth Endpoints', () => {
   beforeAll(async () => {
     // Connects to in-memory db fallback
     await connectDatabase();
-  });
+  }, 180000);
 
   afterAll(async () => {
     await disconnectDatabase();

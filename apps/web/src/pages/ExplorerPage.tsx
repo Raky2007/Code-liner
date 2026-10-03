@@ -18,6 +18,7 @@ export default function ExplorerPage() {
   const [fileTree, setFileTree] = useState<FileNode[]>([]);
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<string>('');
+  const [originalFileContent, setOriginalFileContent] = useState<string | null>(null);
   const [fileIssues, setFileIssues] = useState<CodeIssue[]>([]);
   const [explanation, setExplanation] = useState<AIExplanation | null>(null);
   const [explaining, setExplaining] = useState(false);
@@ -44,6 +45,7 @@ export default function ExplorerPage() {
     setExplanation(null);
     setAlternative(null);
     setIsDiffMode(false);
+    setOriginalFileContent(null);
   }, [selectedPath]);
 
   // Fetch file list & build tree
@@ -135,12 +137,13 @@ export default function ExplorerPage() {
     }
   };
 
-  const handleSuggestAlternative = async () => {
+  const handleSuggestAlternative = async (goal?: string) => {
     if (!id || !selectedPath || !fileContent) return;
     setAlternating(true);
     setAlternative(null);
     try {
-      const data = await aiService.suggestAlternative(id, selectedPath, fileContent);
+      const codeToOptimize = originalFileContent || fileContent;
+      const data = await aiService.suggestAlternative(id, selectedPath, codeToOptimize, goal);
       setAlternative(data);
       setIsDiffMode(true);
     } catch (err: any) {
@@ -148,6 +151,26 @@ export default function ExplorerPage() {
       alert('AI Alternative failed: ' + err.message);
     } finally {
       setAlternating(false);
+    }
+  };
+
+  const handleFixIssue = (issue: CodeIssue) => {
+    setInspectorTab('alternative');
+    handleSuggestAlternative(`Fix finding on line ${issue.line}: ${issue.message}`);
+  };
+
+  const handleApplyAlternative = (code: string) => {
+    if (!originalFileContent) {
+      setOriginalFileContent(fileContent);
+    }
+    setFileContent(code);
+    setIsDiffMode(false);
+  };
+
+  const handleRevertAlternative = () => {
+    if (originalFileContent !== null) {
+      setFileContent(originalFileContent);
+      setOriginalFileContent(null);
     }
   };
 
@@ -225,6 +248,7 @@ export default function ExplorerPage() {
               currentTab={inspectorTab}
               onTabChange={setInspectorTab}
               activeFileMetadata={activeFileMetadata}
+              fileContent={originalFileContent || fileContent}
               issues={fileIssues}
               explanation={explanation}
               explaining={explaining}
@@ -234,8 +258,13 @@ export default function ExplorerPage() {
               onSuggestAlternative={handleSuggestAlternative}
               onJumpToLine={jumpToLine}
               hasActiveFile={Boolean(selectedPath && fileContent)}
+              activeFilePath={selectedPath || undefined}
               isDiffMode={isDiffMode}
               onToggleDiffMode={() => setIsDiffMode(prev => !prev)}
+              onFixIssue={handleFixIssue}
+              onApplyAlternative={handleApplyAlternative}
+              onRevertAlternative={handleRevertAlternative}
+              isApplied={Boolean(originalFileContent && fileContent !== originalFileContent)}
             />
           </div>
         ) : (

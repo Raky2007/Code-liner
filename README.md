@@ -5,6 +5,91 @@
 ![Code-Liner Architecture View](https://img.shields.io/badge/Architecture-React_Flow-pink.svg?style=flat-square)
 ![Code-Liner Stack](https://img.shields.io/badge/Stack-React_%7C_Node.js_%7C_MongoDB-blue.svg?style=flat-square)
 ![AI Powered](https://img.shields.io/badge/AI-OpenRouter_Integration-emerald.svg?style=flat-square)
+![Code Health Index](https://img.shields.io/badge/Code_Health_Index-54%2F100_(Needs_Refactoring)-amber.svg?style=flat-square)
+
+---
+
+## 📊 Code Health Index
+
+Code-Liner calculates a Code Health Index based on multiple software-quality dimensions.
+
+### Metrics
+
+| Metric | Weight | Description |
+|---|---:|---|
+| Module & Function Smells | 30% | Detects large functions, low cohesion, brain methods and structural complexity |
+| Complexity | 30% | Measures cyclomatic complexity, nesting and convoluted execution paths |
+| DRY Violations | 15% | Detects duplicated and repetitive logic |
+| Primitive Obsession | 10% | Detects excessive use of primitives where domain abstractions may be appropriate |
+| Organizational Factors | 15% | Uses repository history to identify hotspots, knowledge concentration and change patterns |
+
+### Current Analysis
+
+For the current analyzed project:
+
+- **Files:** 86
+- **Functions:** 152
+- **Lines of Code:** 22.8K
+- **Static Issues:** 34
+  - **Critical:** 1
+  - **High:** 2
+  - **Medium:** 23
+  - **Low:** 8
+
+### Current Health
+
+**54 / 100 — Needs Refactoring**
+
+This score is provisional when some metrics are not available.
+
+Current analysis provides strong measurements for:
+
+- Module/function smells
+- Complexity
+
+The following metrics should be marked as unavailable until their analyzers are implemented:
+
+- DRY violations (`Not measured`)
+- Primitive obsession (`Not measured`)
+- Organizational factors (`Not enough Git history`)
+
+Do not represent unavailable metrics as healthy.
+
+### Important Findings
+
+The current analysis identifies:
+
+- A critical cyclomatic complexity of **31** (e.g. `validate()`)
+- High complexity values including **24** (e.g. `Registration()`) and **19** (e.g. `run()`)
+- Multiple functions above 100 lines
+- A `Registration` function of approximately **509 lines**
+- Multiple structural and maintainability concerns
+
+### Score Philosophy
+
+Code-Liner does not treat every issue equally.
+
+Severity, magnitude, frequency and affected code are considered.
+
+A critical complexity issue should have substantially more impact than a low-severity maintainability issue.
+
+The goal of the Code Health Index is not to produce an arbitrary number.
+
+It is intended to provide an explainable estimate of maintainability risk.
+
+### Analysis Limitations
+
+Code-Liner's health score depends on the analyzers available for the uploaded project.
+
+A missing metric does not mean the code is healthy.
+
+For example:
+
+> **"DRY: Not measured"** does not mean **"DRY: Excellent"**
+
+Git-based organizational analysis requires repository history.
+
+Scores should therefore be interpreted as an analytical indicator rather than an absolute measure of software quality.
 
 ---
 
@@ -13,9 +98,9 @@
 - **📦 Intelligent Ingestion Pipeline**: Securely upload and unpack ZIP repositories with built-in path-traversal protection and ZIP-bomb limits.
 - **🔍 Polyglot AST Analysis**: Deep source code parsing for JavaScript/TypeScript (via Babel) and robust heuristic syntax analysis for Python, Java, Go, and C++.
 - **🕸️ Automated Architecture Graphs**: Visualizes complex import and call dependencies as an interactive Directed Acyclic Graph (DAG) using React Flow and Dagre.
-- **🤖 Live AI Code Explanations**: Select any block of code and instantly get an AI-powered walkthrough explaining its logic, purpose, and potential optimization alternatives (Powered by OpenRouter).
+- **🤖 Context-Aware AI Code Explanations**: Select any file, function, issue, or architecture node and get an AI-powered walkthrough explaining its logic, purpose, and potential optimization alternatives (Powered by OpenRouter).
 - **📂 Interactive Explorer**: Explore massive codebases through an embedded Monaco Editor instance integrated with seamless syntax highlighting.
-- **🛡️ Quality & Security Scanner**: Identifies cyclomatic complexity anomalies and suggests refactoring targets.
+- **🛡️ Quality & Security Scanner**: Identifies cyclomatic complexity anomalies, module smells, and provides transparent Code Health Index V2 scoring.
 
 ---
 
@@ -89,7 +174,7 @@ npm run dev
 cd apps/web
 npm run dev
 ```
-*(Runs on `http://localhost:5173`)*
+*(Runs on `http://localhost:5173` or `http://localhost:5174`)*
 
 ---
 

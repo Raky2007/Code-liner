@@ -9,6 +9,7 @@ import {
   Network, 
   ShieldAlert, 
   BookOpen, 
+  HeartPulse,
   ArrowRight, 
   Command, 
   X, 
@@ -102,6 +103,14 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
         category: 'Navigation',
         icon: BookOpen,
         onSelect: () => { navigate(`/project/${id}/documentation`); onClose(); },
+      },
+      {
+        id: 'nav-health',
+        title: 'Improve Code Health',
+        subtitle: 'Actionable refactoring roadmap & complexity reduction',
+        category: 'Navigation',
+        icon: HeartPulse,
+        onSelect: () => { navigate(`/project/${id}/improve-health`); onClose(); },
       },
     ];
 

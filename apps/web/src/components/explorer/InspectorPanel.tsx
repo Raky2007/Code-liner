@@ -12,17 +12,23 @@ interface InspectorPanelProps {
   currentTab: InspectorTabType;
   onTabChange: (tab: InspectorTabType) => void;
   activeFileMetadata?: FileMetadata;
+  fileContent?: string;
   issues: CodeIssue[];
   explanation: AIExplanation | null;
   explaining: boolean;
   onExplainCode: () => void;
   alternative: AIOptimization | null;
   alternating: boolean;
-  onSuggestAlternative: () => void;
+  onSuggestAlternative: (goal?: string) => void;
   onJumpToLine: (line: number) => void;
   hasActiveFile: boolean;
+  activeFilePath?: string;
   isDiffMode?: boolean;
   onToggleDiffMode?: () => void;
+  onFixIssue?: (issue: CodeIssue) => void;
+  onApplyAlternative?: (code: string) => void;
+  onRevertAlternative?: () => void;
+  isApplied?: boolean;
 }
 
 interface TabConfigItem {
@@ -43,6 +49,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
   currentTab,
   onTabChange,
   activeFileMetadata,
+  fileContent = '',
   issues,
   explanation,
   explaining,
@@ -52,11 +59,16 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
   onSuggestAlternative,
   onJumpToLine,
   hasActiveFile,
+  activeFilePath,
   isDiffMode,
   onToggleDiffMode,
+  onFixIssue,
+  onApplyAlternative,
+  onRevertAlternative,
+  isApplied,
 }) => {
   return (
-    <aside className="w-80 lg:w-96 flex flex-col bg-white border-l border-[#E2E8F0] h-full overflow-hidden shrink-0 select-none">
+    <aside className="w-84 lg:w-96 flex flex-col bg-white border-l border-[#E2E8F0] h-full overflow-hidden shrink-0 select-none">
       {/* Tab Navigation Header */}
       <div className="h-10 flex border-b border-[#E2E8F0] bg-[#F8FAFC] text-[12px] font-medium shrink-0">
         {tabConfig.map(tab => {
@@ -66,7 +78,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`flex-1 h-full flex items-center justify-center gap-1.5 border-b-2 transition-all ${
+              className={`flex-1 h-full flex items-center justify-center gap-1.5 border-b-2 transition-all cursor-pointer ${
                 isActive
                   ? 'border-[#2563EB] text-[#2563EB] bg-white font-semibold'
                   : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
@@ -89,6 +101,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
         {currentTab === 'entities' && (
           <ASTEntitiesTab
             activeFileMetadata={activeFileMetadata}
+            fileContent={fileContent}
             onJumpToLine={onJumpToLine}
           />
         )}
@@ -97,6 +110,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
           <IssuesTab
             issues={issues}
             onJumpToLine={onJumpToLine}
+            onFixIssue={onFixIssue}
           />
         )}
 
@@ -107,6 +121,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
             onExplainCode={onExplainCode}
             onJumpToLine={onJumpToLine}
             hasActiveFile={hasActiveFile}
+            activeFilePath={activeFilePath}
           />
         )}
 
@@ -118,6 +133,11 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
             hasActiveFile={hasActiveFile}
             isDiffMode={isDiffMode}
             onToggleDiffMode={onToggleDiffMode}
+            issues={issues}
+            activeFilePath={activeFilePath}
+            onApplyAlternative={onApplyAlternative}
+            onRevertAlternative={onRevertAlternative}
+            isApplied={isApplied}
           />
         )}
       </div>

@@ -11,6 +11,7 @@ import ArchitecturePage from './pages/ArchitecturePage';
 import DependenciesPage from './pages/DependenciesPage';
 import IssuesPage from './pages/IssuesPage';
 import DocumentationPage from './pages/DocumentationPage';
+import ImproveHealthPage from './pages/ImproveHealthPage';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <>{children}</>;
@@ -47,6 +48,8 @@ function AppRoutes() {
         <Route path="dependencies" element={<DependenciesPage />} />
         <Route path="issues" element={<IssuesPage />} />
         <Route path="documentation" element={<DocumentationPage />} />
+        <Route path="improve-health" element={<ImproveHealthPage />} />
+        <Route path="code-health" element={<Navigate to="improve-health" replace />} />
       </Route>
       
       <Route path="*" element={<Navigate to="/" replace />} />

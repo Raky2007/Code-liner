@@ -129,7 +129,7 @@ export async function getProjectFiles(req: AuthenticatedRequest, res: Response, 
       return res.status(404).json({ message: 'Project not found.' });
     }
 
-    const files = await File.find({ projectId }).select('path language classes functions imports exports');
+    const files = await File.find({ projectId }).select('path language classes functions imports exports variables');
     return res.status(200).json(files);
   } catch (err) {
     next(err);
@@ -225,10 +225,11 @@ export async function getProjectDocumentation(req: AuthenticatedRequest, res: Re
     const files = await File.find({ projectId });
     const issues = await Issue.find({ projectId });
 
-    const mdDocumentation = reportsService.generateDocumentation(project, files, issues);
+    const { documentation, data } = reportsService.generateDocumentation(project, files, issues);
     return res.status(200).json({
       projectId,
-      documentation: mdDocumentation,
+      documentation,
+      data,
     });
   } catch (err) {
     next(err);
@@ -250,6 +251,7 @@ export async function explainCodeSegment(req: AuthenticatedRequest, res: Respons
 
     const file = await File.findOne({ projectId, path: filePath });
     const language = file ? file.language : 'javascript';
+    const issues = await Issue.find({ projectId, file: filePath });
 
     const explanation = await aiService.explainCode({
       filePath,
@@ -257,6 +259,16 @@ export async function explainCodeSegment(req: AuthenticatedRequest, res: Respons
       codeBlock,
       lineStart,
       lineEnd,
+      issues: issues.map(iss => ({
+        type: iss.type,
+        severity: iss.severity,
+        line: iss.line,
+        message: iss.message,
+      })),
+      symbols: file ? {
+        functions: file.functions?.map(f => f.name) || [],
+        classes: file.classes?.map(c => c.name) || [],
+      } : undefined,
     });
 
     return res.status(200).json(explanation);
@@ -273,18 +285,30 @@ export async function suggestAlternativeCode(req: AuthenticatedRequest, res: Res
       return res.status(404).json({ message: 'Project not found.' });
     }
 
-    const { filePath, codeBlock } = req.body;
+    const { filePath, codeBlock, goal } = req.body;
     if (!filePath || !codeBlock) {
       return res.status(400).json({ message: 'filePath and codeBlock are required.' });
     }
 
     const file = await File.findOne({ projectId, path: filePath });
     const language = file ? file.language : 'javascript';
+    const issues = await Issue.find({ projectId, file: filePath });
 
     const alternative = await aiService.suggestAlternative({
       filePath,
       language,
       codeBlock,
+      goal,
+      issues: issues.map(iss => ({
+        type: iss.type,
+        severity: iss.severity,
+        line: iss.line,
+        message: iss.message,
+      })),
+      symbols: file ? {
+        functions: file.functions?.map(f => f.name) || [],
+        classes: file.classes?.map(c => c.name) || [],
+      } : undefined,
     });
 
     return res.status(200).json(alternative);
